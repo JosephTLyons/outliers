@@ -5,7 +5,7 @@
   data types
 
 - Note: This update introduces some breaking changes, such as
-  `get_tukeys_outliers()` now returns a `Result` instead of an `Option`.
+  `get_tukeys_outliers()` now returns a `Result`.
 
 ## April 11, 2020 - v0.1.0:
 - Initial release
