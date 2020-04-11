@@ -166,16 +166,26 @@ fn get_quartile_values<T: ToPrimitive>(data_vec: &[T]) -> Result<(f32, f32, f32)
 
     let mut halfway = data_vec_length / 2;
 
-    let q1_value = get_median(&data_vec[0..halfway]);
-    let q2_value = get_median(&data_vec);
+    let q1_value = match get_median(&data_vec[0..halfway]) {
+        Ok(value) => value,
+        Err(error) => return Err(error),
+    };
+
+    let q2_value = match get_median(&data_vec) {
+        Ok(value) => value,
+        Err(error) => return Err(error),
+    };
 
     if data_vec_length % 2 != 0 {
         halfway += 1;
     }
 
-    let q3_value = get_median(&data_vec[halfway..data_vec_length]);
+    let q3_value = match get_median(&data_vec[halfway..data_vec_length]) {
+        Ok(value) => value,
+        Err(error) => return Err(error),
+    };
 
-    Ok((q1_value.unwrap(), q2_value.unwrap(), q3_value.unwrap()))
+    Ok((q1_value, q2_value, q3_value))
 }
 
 #[test]
