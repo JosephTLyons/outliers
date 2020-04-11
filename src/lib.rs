@@ -1,14 +1,13 @@
-/// get_tukeys_outliers() uses the Tukey method, which uses a multiplier value of 1.5.
-/// get_tukeys_outliers() returns a tuple that contains three vectors.  The first vector will
-/// contain any lower outliers, the third vector will contain any of upper outliers, and the second
-/// vector will contain non-outliers, or what is left.
+/// This function uses the Tukey method, which uses a multiplier value of 1.5. It returns a tuple
+/// that contains three vectors.  The first vector contains any lower outliers, the third vector
+/// contains any upper outliers, and the second vector contains the non-outliers.
 /// ```
 /// let data = [10, 12, 11, 15, 11, 14, 13, 17, 12, 22, 14, 11].to_vec();
-/// let outliers_tuple = outliers::get_tukeys_outliers(data, false);
+/// let results_tuple = outliers::get_tukeys_outliers(data, false);
 ///
-/// assert_eq!(outliers_tuple.0, [].to_vec());
-/// assert_eq!(outliers_tuple.1, [10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 17].to_vec());
-/// assert_eq!(outliers_tuple.2, [22].to_vec());
+/// assert_eq!(results_tuple.0, [].to_vec());
+/// assert_eq!(results_tuple.1, [10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 17].to_vec());
+/// assert_eq!(results_tuple.2, [22].to_vec());
 /// ```
 pub fn get_tukeys_outliers(
     mut data_vec: Vec<usize>,
@@ -49,67 +48,67 @@ pub fn get_tukeys_outliers(
 #[test]
 fn get_tukeys_outliers_empty_data_set() {
     let data = [].to_vec();
-    let outliers_tuple = get_tukeys_outliers(data, true);
+    let results_tuple = get_tukeys_outliers(data, true);
 
-    assert_eq!(outliers_tuple.0, [].to_vec());
-    assert_eq!(outliers_tuple.1, [].to_vec());
-    assert_eq!(outliers_tuple.2, [].to_vec());
+    assert_eq!(results_tuple.0, [].to_vec());
+    assert_eq!(results_tuple.1, [].to_vec());
+    assert_eq!(results_tuple.2, [].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_set_of_one() {
     let data = [30].to_vec();
-    let outliers_tuple = get_tukeys_outliers(data, true);
+    let results_tuple = get_tukeys_outliers(data, true);
 
-    assert_eq!(outliers_tuple.0, [].to_vec());
-    assert_eq!(outliers_tuple.1, [30].to_vec());
-    assert_eq!(outliers_tuple.2, [].to_vec());
+    assert_eq!(results_tuple.0, [].to_vec());
+    assert_eq!(results_tuple.1, [30].to_vec());
+    assert_eq!(results_tuple.2, [].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_set_of_two() {
     let data = [30, 90].to_vec();
-    let outliers_tuple = get_tukeys_outliers(data, true);
+    let results_tuple = get_tukeys_outliers(data, true);
 
-    assert_eq!(outliers_tuple.0, [].to_vec());
-    assert_eq!(outliers_tuple.1, [30, 90].to_vec());
-    assert_eq!(outliers_tuple.2, [].to_vec());
+    assert_eq!(results_tuple.0, [].to_vec());
+    assert_eq!(results_tuple.1, [30, 90].to_vec());
+    assert_eq!(results_tuple.2, [].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_none() {
     let data = [1, 2, 4, 10].to_vec();
-    let outliers_tuple = get_tukeys_outliers(data, true);
+    let results_tuple = get_tukeys_outliers(data, true);
 
-    assert_eq!(outliers_tuple.0, [].to_vec());
-    assert_eq!(outliers_tuple.1, [1, 2, 4, 10].to_vec());
-    assert_eq!(outliers_tuple.2, [].to_vec());
+    assert_eq!(results_tuple.0, [].to_vec());
+    assert_eq!(results_tuple.1, [1, 2, 4, 10].to_vec());
+    assert_eq!(results_tuple.2, [].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_1() {
     let data = [10, 12, 11, 15, 11, 14, 13, 17, 12, 22, 14, 11].to_vec();
-    let outliers_tuple = get_tukeys_outliers(data, false);
+    let results_tuple = get_tukeys_outliers(data, false);
 
-    assert_eq!(outliers_tuple.0, [].to_vec());
+    assert_eq!(results_tuple.0, [].to_vec());
     assert_eq!(
-        outliers_tuple.1,
+        results_tuple.1,
         [10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 17].to_vec()
     );
-    assert_eq!(outliers_tuple.2, [22].to_vec());
+    assert_eq!(results_tuple.2, [22].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_2() {
     let data = [0, 3, 3, 3, 11, 12, 13, 15, 19, 20, 29, 40, 79].to_vec();
-    let outliers_tuple = get_tukeys_outliers(data, false);
+    let results_tuple = get_tukeys_outliers(data, false);
 
-    assert_eq!(outliers_tuple.0, [].to_vec());
+    assert_eq!(results_tuple.0, [].to_vec());
     assert_eq!(
-        outliers_tuple.1,
+        results_tuple.1,
         [0, 3, 3, 3, 11, 12, 13, 15, 19, 20, 29, 40].to_vec()
     );
-    assert_eq!(outliers_tuple.2, [79].to_vec());
+    assert_eq!(results_tuple.2, [79].to_vec());
 }
 
 fn get_quartile_values(data_vec: &[usize]) -> Option<(f32, f32, f32)> {
