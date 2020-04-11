@@ -16,6 +16,8 @@ fn get_error_messages(error_message: ErrorMessage) -> &'static str {
     }
 }
 
+type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
+
 /// This function uses the Tukey method, which uses a multiplier value of 1.5. In the case that is
 /// does not return an `Err`, it returns a tuple of `Vec<T>`.  The first vector contains any lower
 /// outliers and the third vector contains any upper outliers.  Additionally, the second vector
@@ -32,7 +34,7 @@ fn get_error_messages(error_message: ErrorMessage) -> &'static str {
 pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
     mut data_vec: Vec<T>,
     is_sorted: bool,
-) -> Result<(Vec<T>, Vec<T>, Vec<T>), &'static str> {
+) -> Result<VectorTuple<T>, &'static str> {
     if !is_sorted {
         // TODO: Error handle this unwrap
         data_vec.sort_by(|a, b| a.partial_cmp(b).unwrap());
