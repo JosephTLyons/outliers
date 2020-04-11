@@ -305,13 +305,13 @@ fn get_median_random_numbers_odd_set() {
 }
 
 #[test]
-fn get_median_float_even_set() {
-    assert!((get_median(&[1.32, 32.2]).unwrap() - 16.76).abs() < 0.0001);
+fn get_median_float_negative_even_set() {
+    assert!((get_median(&[-1.32, 32.2]).unwrap() - 15.44).abs() < 0.0001);
 }
 
 #[test]
-fn get_median_float_odd_set() {
-    assert!((get_median(&[1.32, 32.2, 40.1]).unwrap() - 32.2).abs() < 0.0001);
+fn get_median_float_negative_odd_set() {
+    assert!((get_median(&[-1.32, 32.2, 40.1]).unwrap() - 32.2).abs() < 0.0001);
 }
 
 // TODO: Should there be a float test for each case that integers were tested on?
