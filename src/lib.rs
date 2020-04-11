@@ -1,7 +1,15 @@
 /// get_tukeys_outliers() uses the Tukey method, which uses a multiplier value of 1.5.
-/// get_tukeys_outliers() returns a tuple that contains three vectors.  The first vector will contain any
-/// lower outliers, the third vector will contain any of upper outliers, and the second vector will
-/// contain non-outliers, or what is left.
+/// get_tukeys_outliers() returns a tuple that contains three vectors.  The first vector will
+/// contain any lower outliers, the third vector will contain any of upper outliers, and the second
+/// vector will contain non-outliers, or what is left.
+/// ```
+/// let data = [10, 12, 11, 15, 11, 14, 13, 17, 12, 22, 14, 11].to_vec();
+/// let outliers_tuple = outliers::get_tukeys_outliers(data, false);
+///
+/// assert_eq!(outliers_tuple.0, [].to_vec());
+/// assert_eq!(outliers_tuple.1, [10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 17].to_vec());
+/// assert_eq!(outliers_tuple.2, [22].to_vec());
+/// ```
 pub fn get_tukeys_outliers(
     mut data_vec: Vec<usize>,
     is_sorted: bool,
@@ -40,64 +48,68 @@ pub fn get_tukeys_outliers(
 
 #[test]
 fn get_tukeys_outliers_empty_data_set() {
-    assert_eq!(
-        get_tukeys_outliers([].to_vec(), true),
-        ([].to_vec(), [].to_vec(), [].to_vec())
-    );
+    let data = [].to_vec();
+    let outliers_tuple = get_tukeys_outliers(data, true);
+
+    assert_eq!(outliers_tuple.0, [].to_vec());
+    assert_eq!(outliers_tuple.1, [].to_vec());
+    assert_eq!(outliers_tuple.2, [].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_set_of_one() {
-    assert_eq!(
-        get_tukeys_outliers([30].to_vec(), true),
-        ([].to_vec(), [30].to_vec(), [].to_vec())
-    );
+    let data = [30].to_vec();
+    let outliers_tuple = get_tukeys_outliers(data, true);
+
+    assert_eq!(outliers_tuple.0, [].to_vec());
+    assert_eq!(outliers_tuple.1, [30].to_vec());
+    assert_eq!(outliers_tuple.2, [].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_set_of_two() {
-    assert_eq!(
-        get_tukeys_outliers([30, 90].to_vec(), true),
-        ([].to_vec(), [30, 90].to_vec(), [].to_vec())
-    );
+    let data = [30, 90].to_vec();
+    let outliers_tuple = get_tukeys_outliers(data, true);
+
+    assert_eq!(outliers_tuple.0, [].to_vec());
+    assert_eq!(outliers_tuple.1, [30, 90].to_vec());
+    assert_eq!(outliers_tuple.2, [].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_none() {
-    assert_eq!(
-        get_tukeys_outliers([1, 2, 4, 10].to_vec(), true),
-        ([].to_vec(), [1, 2, 4, 10].to_vec(), [].to_vec())
-    );
+    let data = [1, 2, 4, 10].to_vec();
+    let outliers_tuple = get_tukeys_outliers(data, true);
+
+    assert_eq!(outliers_tuple.0, [].to_vec());
+    assert_eq!(outliers_tuple.1, [1, 2, 4, 10].to_vec());
+    assert_eq!(outliers_tuple.2, [].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_1() {
+    let data = [10, 12, 11, 15, 11, 14, 13, 17, 12, 22, 14, 11].to_vec();
+    let outliers_tuple = get_tukeys_outliers(data, false);
+
+    assert_eq!(outliers_tuple.0, [].to_vec());
     assert_eq!(
-        get_tukeys_outliers(
-            [10, 12, 11, 15, 11, 14, 13, 17, 12, 22, 14, 11].to_vec(),
-            false
-        ),
-        (
-            [].to_vec(),
-            [10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 17].to_vec(),
-            [22].to_vec()
-        )
+        outliers_tuple.1,
+        [10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 17].to_vec()
     );
+    assert_eq!(outliers_tuple.2, [22].to_vec());
 }
 
 #[test]
 fn get_tukeys_outliers_2() {
+    let data = [0, 3, 3, 3, 11, 12, 13, 15, 19, 20, 29, 40, 79].to_vec();
+    let outliers_tuple = get_tukeys_outliers(data, false);
+
+    assert_eq!(outliers_tuple.0, [].to_vec());
     assert_eq!(
-        get_tukeys_outliers(
-            [0, 3, 3, 3, 11, 12, 13, 15, 19, 20, 29, 40, 79].to_vec(),
-            false
-        ),
-        (
-            [].to_vec(),
-            [0, 3, 3, 3, 11, 12, 13, 15, 19, 20, 29, 40].to_vec(),
-            [79].to_vec()
-        )
+        outliers_tuple.1,
+        [0, 3, 3, 3, 11, 12, 13, 15, 19, 20, 29, 40].to_vec()
     );
+    assert_eq!(outliers_tuple.2, [79].to_vec());
 }
 
 fn get_quartile_values(data_vec: &[usize]) -> Option<(f32, f32, f32)> {
@@ -123,22 +135,34 @@ fn get_quartile_values(data_vec: &[usize]) -> Option<(f32, f32, f32)> {
 
 #[test]
 fn get_quartile_values_empty_set() {
-    assert!(get_quartile_values(&[]).is_none());
+    let data = [];
+    let quartile_values_option = get_quartile_values(&data);
+
+    assert_eq!(quartile_values_option, None);
 }
 
 #[test]
 fn get_quartile_values_set_of_one() {
-    assert!(get_quartile_values(&[10]).is_none());
+    let data = [10];
+    let quartile_values_option = get_quartile_values(&data);
+
+    assert_eq!(quartile_values_option, None);
 }
 
 #[test]
 fn get_quartile_values_set_of_two() {
-    assert_eq!(get_quartile_values(&[10, 12]), Some((10.0, 11.0, 12.0)));
+    let data = [10, 12];
+    let quartile_values_option = get_quartile_values(&data);
+
+    assert_eq!(quartile_values_option, Some((10.0, 11.0, 12.0)));
 }
 
 #[test]
 fn get_quartile_values_set_of_three() {
-    assert_eq!(get_quartile_values(&[10, 11, 12]), Some((10.0, 11.0, 12.0)));
+    let data = [10, 11, 12];
+    let quartile_values_option = get_quartile_values(&data);
+
+    assert_eq!(quartile_values_option, Some((10.0, 11.0, 12.0)));
 }
 
 // [1   2   3   4]   [5   6   7   8]
@@ -146,10 +170,10 @@ fn get_quartile_values_set_of_three() {
 //        Q1       Q2       Q3
 #[test]
 fn get_quartile_values_even_set_even_halves() {
-    assert_eq!(
-        get_quartile_values(&[1, 2, 3, 4, 5, 6, 7, 8]),
-        Some((2.5, 4.5, 6.5))
-    );
+    let data = [1, 2, 3, 4, 5, 6, 7, 8];
+    let quartile_values_option = get_quartile_values(&data);
+
+    assert_eq!(quartile_values_option, Some((2.5, 4.5, 6.5)));
 }
 
 // [1   2   3]   [4   5   6]
@@ -157,10 +181,10 @@ fn get_quartile_values_even_set_even_halves() {
 //      Q1     Q2     Q3
 #[test]
 fn get_quartile_values_even_set_odd_halves() {
-    assert_eq!(
-        get_quartile_values(&[1, 2, 3, 4, 5, 6]),
-        Some((2.0, 3.5, 5.0))
-    );
+    let data = [1, 2, 3, 4, 5, 6];
+    let quartile_values_option = get_quartile_values(&data);
+
+    assert_eq!(quartile_values_option, Some((2.0, 3.5, 5.0)));
 }
 
 // [1   2   3   4]   5   [6   7   8   9]
@@ -168,10 +192,10 @@ fn get_quartile_values_even_set_odd_halves() {
 //        Q1         Q2         Q3
 #[test]
 fn get_quartile_values_odd_set_even_halves() {
-    assert_eq!(
-        get_quartile_values(&[1, 2, 3, 4, 5, 6, 7, 8, 9]),
-        Some((2.5, 5.0, 7.5))
-    );
+    let data = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    let quartile_values_option = get_quartile_values(&data);
+
+    assert_eq!(quartile_values_option, Some((2.5, 5.0, 7.5)));
 }
 
 // [1   2   3   4   5]   6   [7   8   9   10   11]
@@ -179,10 +203,10 @@ fn get_quartile_values_odd_set_even_halves() {
 //          Q1           Q2           Q3
 #[test]
 fn get_quartile_values_odd_set_odd_halves() {
-    assert_eq!(
-        get_quartile_values(&[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]).unwrap(),
-        (3.0, 6.0, 9.0)
-    );
+    let data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+    let quartile_values_option = get_quartile_values(&data);
+
+    assert_eq!(quartile_values_option, Some((3.0, 6.0, 9.0)));
 }
 
 fn get_median(data_vec: &[usize]) -> Option<f32> {
