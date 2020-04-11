@@ -1,5 +1,21 @@
 use num::ToPrimitive;
 
+enum ErrorMessage {
+    Casting,
+    MinimumSetForQuartile,
+    MinimumSetForMedian,
+}
+
+fn get_error_messages(error_message: ErrorMessage) -> &'static str {
+    match error_message {
+        ErrorMessage::Casting => "Had issues casting `T` to `f32`",
+        ErrorMessage::MinimumSetForQuartile => {
+            "Cannot calculate the quartile values of a data set with less than 2 elements"
+        }
+        ErrorMessage::MinimumSetForMedian => "Cannot calculate the median of an empty data set",
+    }
+}
+
 /// This function uses the Tukey method, which uses a multiplier value of 1.5. In the case that is
 /// does not return an `Err`, it returns a tuple of `Vec<T>`.  The first vector contains any lower
 /// outliers and the third vector contains any upper outliers.  Additionally, the second vector
@@ -37,7 +53,7 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
         for data in data_vec {
             let data_f32 = match ToPrimitive::to_f32(&data) {
                 Some(value_f32) => value_f32,
-                None => return Err("Had issues casting T to f32"),
+                None => return Err(get_error_messages(ErrorMessage::Casting)),
             };
 
             if (data_f32) < lower_range {
@@ -143,7 +159,7 @@ fn get_quartile_values<T: ToPrimitive>(data_vec: &[T]) -> Result<(f32, f32, f32)
     let data_vec_length = data_vec.len();
 
     if data_vec_length < 2 {
-        return Err("Cannot calculate the quartile values of a data set with less than 2 elements");
+        return Err(get_error_messages(ErrorMessage::MinimumSetForQuartile));
     }
 
     let mut halfway = data_vec_length / 2;
@@ -258,21 +274,20 @@ fn get_median<T: ToPrimitive>(data_vec: &[T]) -> Result<f32, &'static str> {
     let data_vec_length = data_vec.len();
 
     if data_vec_length == 0 {
-        return Err("Cannot calculate the median of an empty data set");
+        return Err(get_error_messages(ErrorMessage::MinimumSetForMedian));
     }
 
     let half_way = data_vec_length / 2;
-    let error_message: &'static str = "Had issues casting T to f32";
 
     let mut result_f32 = match ToPrimitive::to_f32(&data_vec[half_way]) {
         Some(value_f32) => value_f32,
-        None => return Err(error_message),
+        None => return Err(get_error_messages(ErrorMessage::Casting)),
     };
 
     if data_vec.len() % 2 == 0 {
         let left_middle = match ToPrimitive::to_f32(&data_vec[half_way - 1]) {
             Some(value_f32) => value_f32,
-            None => return Err(error_message),
+            None => return Err(get_error_messages(ErrorMessage::Casting)),
         };
 
         result_f32 = (result_f32 + left_middle) / 2.0;
