@@ -87,19 +87,6 @@ fn get_tukeys_outliers_none() {
 
 #[test]
 fn get_tukeys_outliers_1() {
-    let data = [10, 12, 11, 15, 11, 14, 13, 17, 12, 22, 14, 11].to_vec();
-    let results_tuple = get_tukeys_outliers(data, false);
-
-    assert_eq!(results_tuple.0, [].to_vec());
-    assert_eq!(
-        results_tuple.1,
-        [10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 17].to_vec()
-    );
-    assert_eq!(results_tuple.2, [22].to_vec());
-}
-
-#[test]
-fn get_tukeys_outliers_2() {
     let data = [0, 3, 3, 3, 11, 12, 13, 15, 19, 20, 29, 40, 79].to_vec();
     let results_tuple = get_tukeys_outliers(data, false);
 
