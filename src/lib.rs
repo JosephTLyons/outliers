@@ -1,20 +1,7 @@
 use num::ToPrimitive;
 
-enum ErrorMessage {
-    Casting,
-    MinimumSetForQuartile,
-    MinimumSetForMedian,
-}
-
-fn get_error_messages(error_message: ErrorMessage) -> &'static str {
-    match error_message {
-        ErrorMessage::Casting => "Had issues casting `T` to `f32`",
-        ErrorMessage::MinimumSetForQuartile => {
-            "Cannot calculate the quartile values of a data set with less than 2 elements"
-        }
-        ErrorMessage::MinimumSetForMedian => "Cannot calculate the median of an empty data set",
-    }
-}
+mod helper_items;
+use helper_items::{get_error_message, get_quartile_values, ErrorMessage};
 
 type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
 
@@ -37,37 +24,47 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
 ) -> Result<VectorTuple<T>, &'static str> {
     if !is_sorted {
         // TODO: Error handle this unwrap
-        data_vec.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        data_vec.sort_by(|a, b| {
+            a.partial_cmp(b)
+                .unwrap_or_else(|| panic!(get_error_message(ErrorMessage::Sort)))
+        });
     }
 
     let mut lower_outliers: Vec<T> = Vec::new();
     let mut upper_outliers: Vec<T> = Vec::new();
 
-    if let Ok((q1_value, _, q3_value)) = get_quartile_values(&data_vec) {
-        let interquartile_range: f32 = q3_value - q1_value;
+    match get_quartile_values(&data_vec) {
+        Ok((q1_value, _, q3_value)) => {
+            let interquartile_range: f32 = q3_value - q1_value;
 
-        let intermediate_value: f32 = 1.5 * interquartile_range;
-        let lower_range: f32 = q1_value - intermediate_value;
-        let upper_range: f32 = q3_value + intermediate_value;
+            let intermediate_value: f32 = 1.5 * interquartile_range;
+            let lower_range: f32 = q1_value - intermediate_value;
+            let upper_range: f32 = q3_value + intermediate_value;
 
-        let mut non_outliers: Vec<T> = Vec::new();
+            let mut non_outliers: Vec<T> = Vec::new();
 
-        for data in data_vec {
-            let data_f32 = match ToPrimitive::to_f32(&data) {
-                Some(value_f32) => value_f32,
-                None => return Err(get_error_messages(ErrorMessage::Casting)),
-            };
+            for data in data_vec {
+                let data_f32 = match ToPrimitive::to_f32(&data) {
+                    Some(value_f32) => value_f32,
+                    None => return Err(get_error_message(ErrorMessage::ToPrimitiveCast)),
+                };
 
-            if (data_f32) < lower_range {
-                lower_outliers.push(data);
-            } else if (data_f32) > upper_range {
-                upper_outliers.push(data);
-            } else {
-                non_outliers.push(data);
+                if (data_f32) < lower_range {
+                    lower_outliers.push(data);
+                } else if (data_f32) > upper_range {
+                    upper_outliers.push(data);
+                } else {
+                    non_outliers.push(data);
+                }
+            }
+
+            data_vec = non_outliers;
+        }
+        Err(error) => {
+            if let ErrorMessage::ToPrimitiveCast = error {
+                return Err(get_error_message(ErrorMessage::ToPrimitiveCast));
             }
         }
-
-        data_vec = non_outliers;
     }
 
     Ok((lower_outliers, data_vec, upper_outliers))
@@ -153,200 +150,6 @@ fn get_tukeys_outliers_float_negative_2() {
         [43.3, 51.7, 65.43, 67.23, 67.9, 71.02].to_vec()
     );
     assert_eq!(results_tuple.2, [].to_vec());
-}
-
-// TODO: Should there be a float test for each case that integers were tested on?
-
-fn get_quartile_values<T: ToPrimitive>(data_vec: &[T]) -> Result<(f32, f32, f32), &'static str> {
-    let data_vec_length = data_vec.len();
-
-    if data_vec_length < 2 {
-        return Err(get_error_messages(ErrorMessage::MinimumSetForQuartile));
-    }
-
-    let mut halfway = data_vec_length / 2;
-
-    let q1_value = match get_median(&data_vec[0..halfway]) {
-        Ok(value) => value,
-        Err(error) => return Err(error),
-    };
-
-    let q2_value = match get_median(&data_vec) {
-        Ok(value) => value,
-        Err(error) => return Err(error),
-    };
-
-    if data_vec_length % 2 != 0 {
-        halfway += 1;
-    }
-
-    let q3_value = match get_median(&data_vec[halfway..data_vec_length]) {
-        Ok(value) => value,
-        Err(error) => return Err(error),
-    };
-
-    Ok((q1_value, q2_value, q3_value))
-}
-
-#[test]
-fn get_quartile_values_empty_set() {
-    let data: [usize; 0] = [];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert!(quartile_values_option.is_err());
-}
-
-#[test]
-fn get_quartile_values_set_of_one() {
-    let data = [10];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert!(quartile_values_option.is_err());
-}
-
-#[test]
-fn get_quartile_values_set_of_two() {
-    let data = [10, 12];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert_eq!(quartile_values_option, Ok((10.0, 11.0, 12.0)));
-}
-
-#[test]
-fn get_quartile_values_set_of_three() {
-    let data = [10, 11, 12];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert_eq!(quartile_values_option, Ok((10.0, 11.0, 12.0)));
-}
-
-// [1   2   3   4]   [5   6   7   8]
-//        |        |        |
-//        Q1       Q2       Q3
-#[test]
-fn get_quartile_values_even_set_even_halves() {
-    let data = [1, 2, 3, 4, 5, 6, 7, 8];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert_eq!(quartile_values_option, Ok((2.5, 4.5, 6.5)));
-}
-
-// [1   2   3]   [4   5   6]
-//      |      |      |
-//      Q1     Q2     Q3
-#[test]
-fn get_quartile_values_even_set_odd_halves() {
-    let data = [1, 2, 3, 4, 5, 6];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert_eq!(quartile_values_option, Ok((2.0, 3.5, 5.0)));
-}
-
-// [1   2   3   4]   5   [6   7   8   9]
-//        |          |          |
-//        Q1         Q2         Q3
-#[test]
-fn get_quartile_values_odd_set_even_halves() {
-    let data = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert_eq!(quartile_values_option, Ok((2.5, 5.0, 7.5)));
-}
-
-// [1   2   3   4   5]   6   [7   8   9   10   11]
-//          |            |            |
-//          Q1           Q2           Q3
-#[test]
-fn get_quartile_values_odd_set_odd_halves() {
-    let data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert_eq!(quartile_values_option, Ok((3.0, 6.0, 9.0)));
-}
-
-#[test]
-fn get_quartile_values_float_set_of_two() {
-    let data = [10.27, 12.9];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert_eq!(quartile_values_option, Ok((10.27, 11.585, 12.9)));
-}
-
-#[test]
-fn get_quartile_values_float_set_of_three() {
-    let data = [10.167, 11.917, 12.3];
-    let quartile_values_option = get_quartile_values(&data);
-
-    assert_eq!(quartile_values_option, Ok((10.167, 11.917, 12.3)));
-}
-
-// TODO: Should there be a float test for each case that integers were tested on?
-
-fn get_median<T: ToPrimitive>(data_vec: &[T]) -> Result<f32, &'static str> {
-    let data_vec_length = data_vec.len();
-
-    if data_vec_length == 0 {
-        return Err(get_error_messages(ErrorMessage::MinimumSetForMedian));
-    }
-
-    let half_way = data_vec_length / 2;
-
-    let mut result_f32 = match ToPrimitive::to_f32(&data_vec[half_way]) {
-        Some(value_f32) => value_f32,
-        None => return Err(get_error_messages(ErrorMessage::Casting)),
-    };
-
-    if data_vec.len() % 2 == 0 {
-        let left_middle = match ToPrimitive::to_f32(&data_vec[half_way - 1]) {
-            Some(value_f32) => value_f32,
-            None => return Err(get_error_messages(ErrorMessage::Casting)),
-        };
-
-        result_f32 = (result_f32 + left_middle) / 2.0;
-    }
-
-    Ok(result_f32)
-}
-
-#[test]
-fn get_median_no_elements() {
-    let data: Vec<usize> = [].to_vec();
-    assert!(get_median(&data).is_err());
-}
-
-#[test]
-fn get_median_one_element() {
-    assert!((get_median(&[3]).unwrap() - 3.0).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_even_set() {
-    assert!((get_median(&[1, 2, 3, 4, 5, 6]).unwrap() - 3.5).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_odd_set() {
-    assert!((get_median(&[1, 2, 3, 4, 5]).unwrap() - 3.0).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_random_numbers_even_set() {
-    assert!((get_median(&[1, 11, 34, 66, 209, 353, 1067, 10_453]).unwrap() - 137.5).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_random_numbers_odd_set() {
-    assert!((get_median(&[1, 23, 24, 45, 200, 343, 1001]).unwrap() - 45.0).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_float_negative_even_set() {
-    assert!((get_median(&[-1.32, 32.2]).unwrap() - 15.44).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_float_negative_odd_set() {
-    assert!((get_median(&[-1.32, 32.2, 40.1]).unwrap() - 32.2).abs() < 0.0001);
 }
 
 // TODO: Should there be a float test for each case that integers were tested on?
