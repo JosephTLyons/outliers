@@ -8,8 +8,8 @@ type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
 /// This function uses the Tukey method, which uses a multiplier value of 1.5. In the case that is
 /// does not return an `Err`, it returns a tuple of `Vec<T>`.  The first vector contains any lower
 /// outliers and the third vector contains any upper outliers.  Additionally, the second vector
-/// returned contains all the non-outliers, so that the data set passed in is returned in its
-/// entirety as partitioned subsets.
+/// returned contains all the non-outliers, so that the data set passed in is returned, in its
+/// entirety, as partitioned subsets.
 /// ```
 /// let data = [10, 12, 11, 15, 11, 14, 13, 17, 12, 22, 14, 11].to_vec();
 /// let results_tuple = outliers::get_tukeys_outliers(data, false).unwrap();
