@@ -20,9 +20,9 @@ type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
 /// ```
 pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
     mut data_vec: Vec<T>,
-    is_sorted: bool,
+    data_is_sorted: bool,
 ) -> Result<VectorTuple<T>, &'static str> {
-    if !is_sorted {
+    if !data_is_sorted {
         // TODO: Error handle this unwrap
         data_vec.sort_by(|a, b| {
             a.partial_cmp(b)
