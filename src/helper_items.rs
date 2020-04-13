@@ -2,20 +2,20 @@ use num::ToPrimitive;
 
 #[derive(std::cmp::PartialEq, std::fmt::Debug)]
 pub enum ErrorMessage {
-    ToPrimitiveCast,
-    MinimumSetForQuartile,
     MinimumSetForMedian,
+    MinimumSetForQuartile,
     Sort,
+    ToPrimitiveCast,
 }
 
 pub fn get_error_message(error_message: ErrorMessage) -> &'static str {
     match error_message {
-        ErrorMessage::ToPrimitiveCast => "Had issues ToPrimitiveCast `T` to `f32`",
+        ErrorMessage::MinimumSetForMedian => "Cannot calculate the median of an empty data set",
         ErrorMessage::MinimumSetForQuartile => {
             "Cannot calculate the quartile values of a data set with less than 2 elements"
         }
-        ErrorMessage::MinimumSetForMedian => "Cannot calculate the median of an empty data set",
         ErrorMessage::Sort => "Sorting the data failed",
+        ErrorMessage::ToPrimitiveCast => "Had issues ToPrimitiveCast `T` to `f32`",
     }
 }
 
