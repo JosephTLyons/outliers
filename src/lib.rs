@@ -23,7 +23,6 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
     data_is_sorted: bool,
 ) -> Result<VectorTuple<T>, &'static str> {
     if !data_is_sorted {
-        // TODO: Error handle this unwrap
         data_vec.sort_by(|a, b| {
             a.partial_cmp(b)
                 .unwrap_or_else(|| panic!(get_error_message(ErrorMessage::Sort)))
