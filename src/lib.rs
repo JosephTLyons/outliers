@@ -151,5 +151,3 @@ fn get_tukeys_outliers_float_negative_2() {
     );
     assert_eq!(results_tuple.2, [].to_vec());
 }
-
-// TODO: Should there be a float test for each case that integers were tested on?

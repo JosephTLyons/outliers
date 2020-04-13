@@ -144,8 +144,6 @@ fn get_quartile_values_float_set_of_three() {
     assert_eq!(quartile_values_result, Ok((10.167, 11.917, 12.3)));
 }
 
-// TODO: Should there be a float test for each case that integers were tested on?
-
 pub fn get_median<T: ToPrimitive>(data_vec: &[T]) -> Result<f32, ErrorMessage> {
     let data_vec_length = data_vec.len();
 
@@ -212,5 +210,3 @@ fn get_median_float_negative_even_set() {
 fn get_median_float_negative_odd_set() {
     assert!((get_median(&[-1.32, 32.2, 40.1]).unwrap() - 32.2).abs() < 0.0001);
 }
-
-// TODO: Should there be a float test for each case that integers were tested on?
