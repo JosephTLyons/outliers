@@ -15,7 +15,7 @@ pub fn get_error_message(error_message: ErrorMessage) -> &'static str {
             "Cannot calculate the quartile values of a data set with less than 2 elements"
         }
         ErrorMessage::Sort => "Sorting the data failed",
-        ErrorMessage::ToPrimitiveCast => "Had issues ToPrimitiveCast `T` to `f32`",
+        ErrorMessage::ToPrimitiveCast => "Had issues using ToPrimitiveCast to cast `T` to `f32`",
     }
 }
 
