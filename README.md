@@ -1,5 +1,5 @@
 # outliers
 
-A Rust crate used to Identify outliers in a data set
+A Rust crate used to identify outliers in a data set
 
-Read about this crate [here](https://docs.rs/outliers/0.2.0/outliers/index.html).
+Read about outliers on [docs.rs](https://docs.rs/outliers/0.2.0/outliers/index.html).
