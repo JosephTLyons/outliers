@@ -18,14 +18,19 @@ type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
 /// assert_eq!(results_tuple.1, [10, 11, 11, 11, 12, 12, 13, 14, 14, 15, 17].to_vec()); // Non-outliers
 /// assert_eq!(results_tuple.2, [22].to_vec()); // Upper outliers
 /// ```
+#[allow(clippy::eq_op)]
 pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
     mut data_vec: Vec<T>,
     data_is_sorted: bool,
 ) -> Result<VectorTuple<T>, &'static str> {
+    // Tests for NaNs in floats, should catch cases where the next `unwrap()` would panic
+    if data_vec.iter().any(|x| !(x == x)) {
+        return Err(get_error_message(ErrorMessage::NanError));
+    }
+
     if !data_is_sorted {
         data_vec.sort_by(|a, b| {
-            a.partial_cmp(b)
-                .unwrap_or_else(|| panic!(get_error_message(ErrorMessage::Sort)))
+            a.partial_cmp(b).unwrap()
         });
     }
 
@@ -67,6 +72,28 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
     }
 
     Ok((lower_outliers, data_vec, upper_outliers))
+}
+
+#[allow(clippy::eq_op)]
+#[allow(clippy::zero_divided_by_zero)]
+#[test]
+fn get_tukeys_outliers_needs_sorted_nan_set() {
+    let nan: f64 = 0.0 / 0.0;
+    let data: Vec<f64> = [nan, nan].to_vec();
+    let results_tuple = get_tukeys_outliers(data, false);
+
+    assert!(results_tuple.is_err());
+}
+
+#[allow(clippy::eq_op)]
+#[allow(clippy::zero_divided_by_zero)]
+#[test]
+fn get_tukeys_outliers_is_sorted_nan_set() {
+    let nan: f64 = 0.0 / 0.0;
+    let data: Vec<f64> = [3.0, 2.9, 2.8, 33.3, nan, nan].to_vec();
+    let results_tuple = get_tukeys_outliers(data, true);
+
+    assert!(results_tuple.is_err());
 }
 
 #[test]
