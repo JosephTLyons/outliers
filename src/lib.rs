@@ -23,7 +23,8 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
     mut data_vec: Vec<T>,
     data_is_sorted: bool,
 ) -> Result<VectorTuple<T>, &'static str> {
-    // Tests for NaNs in floats, should catch cases where the next `unwrap()` would panic
+    // Tests for NaNs in floats, should catch cases where the next `unwrap()` would panic, see:
+    // https://doc.rust-lang.org/std/vec/struct.Vec.html#method.sort_by
     if data_vec.iter().any(|x| !(x == x)) {
         return Err(get_error_message(ErrorMessage::NanError));
     }
