@@ -79,8 +79,7 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
 #[allow(clippy::zero_divided_by_zero)]
 #[test]
 fn get_tukeys_outliers_needs_sorted_nan_set() {
-    let nan: f64 = 0.0 / 0.0;
-    let data: Vec<f64> = [nan, nan].to_vec();
+    let data: Vec<f64> = [f64::NAN, f64::NAN].to_vec();
     let results_tuple = get_tukeys_outliers(data, false);
 
     assert!(results_tuple.is_err());
@@ -90,8 +89,7 @@ fn get_tukeys_outliers_needs_sorted_nan_set() {
 #[allow(clippy::zero_divided_by_zero)]
 #[test]
 fn get_tukeys_outliers_is_sorted_nan_set() {
-    let nan: f64 = 0.0 / 0.0;
-    let data: Vec<f64> = [3.0, 2.9, 2.8, 33.3, nan, nan].to_vec();
+    let data: Vec<f64> = [3.0, 2.9, 2.8, 33.3, f64::NAN, f64::NAN].to_vec();
     let results_tuple = get_tukeys_outliers(data, true);
 
     assert!(results_tuple.is_err());
