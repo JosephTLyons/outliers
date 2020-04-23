@@ -1,6 +1,6 @@
 # CHANGELOG:
 
-## April XX, 2020 - v0.2.1:
+## April 14, 2020 - v0.2.1:
 - Improvements to error handling
 
 ## April 11, 2020 - v0.2.0:
