@@ -6,7 +6,7 @@ use helper_items::{get_error_message, get_quartile_values, ErrorMessage};
 type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
 
 /// This function uses the Tukey method, which uses a multiplier value of 1.5. In the case that is
-/// does not return an `Err`, it returns a tuple of `Vec<T>`.  The first vector contains any lower
+/// does not return an `Err`, it returns a tuple of `Vec<T>`s.  The first vector contains any lower
 /// outliers and the third vector contains any upper outliers.  Additionally, the second vector
 /// returned contains all the non-outliers, so that the data set passed in is returned, in its
 /// entirety, as partitioned subsets.
