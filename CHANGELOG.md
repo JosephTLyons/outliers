@@ -1,5 +1,16 @@
 # CHANGELOG:
 
+## July 13, 2020 - v0.4.0
+
+- Restructure code in crate to use a `struct` so that the
+  [Builder Pattern](https://doc.rust-lang.org/1.0.0/style/ownership/builders.html)
+  can be used.
+- With can now specify a `k_value` other than the original default of 1.5, which
+  allows the crate to be useful in other contexts.
+- **Note**: This introduces breaking changes with previous versions (we are
+  still pre-v1.0.0, so it more breaking changes could still occur in future
+  updates).
+
 ## July 13, 2020 - v0.3.0
 
 - General code cleanup
@@ -15,7 +26,7 @@
 
 ## April 11, 2020 - v0.2.0
 
-- NOTE: This update introduces some breaking changes, such as
+- **Note**: This update introduces some breaking changes, such as
   `get_tukeys_outliers()` now returns a `Result`
 - `get_tukeys_outliers()` is now generic and can accept more than just `usize`
   data types

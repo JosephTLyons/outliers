@@ -1,6 +1,6 @@
 [package]
 name = "outliers"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Joseph T Lyons <JosephTLyons@gmail.com>"]
 edition = "2018"
 description = "Identify outliers in a data set."
