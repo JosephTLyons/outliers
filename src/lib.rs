@@ -27,7 +27,9 @@ impl OutlierIdentifier {
         }
     }
 
-    /// Allows for altering the `k_value`
+    /// Allows for altering the `k_value`.  A larger `k_value` will result in fewer numbers being
+    /// identified as outliers, while a smaller `k_value` will result in more numbers being
+    /// identified as outliers.
     pub fn with_k_value(self, k_value: f64) -> OutlierIdentifier {
         OutlierIdentifier {
             data_set: self.data_set,
