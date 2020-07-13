@@ -49,10 +49,8 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
             let mut non_outliers: Vec<T> = Vec::new();
 
             for data in data_vec {
-                let data_f32 = match ToPrimitive::to_f32(&data) {
-                    Some(value_f32) => value_f32,
-                    None => return Err(get_error_message(ErrorMessage::ToPrimitiveCast)),
-                };
+                let data_f32 = ToPrimitive::to_f32(&data)
+                    .ok_or(get_error_message(ErrorMessage::ToPrimitiveCast))?;
 
                 if (data_f32) < lower_range {
                     lower_outliers.push(data);
