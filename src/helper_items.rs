@@ -31,14 +31,14 @@ pub fn get_quartile_values<T: ToPrimitive + PartialOrd + Clone>(
 
     let mut halfway = data_vec_length / 2;
 
-    let first_half_iter = data_vec.iter().take(halfway).cloned();
     let full_iter = data_vec.iter().cloned();
+    let first_half_iter = full_iter.clone().take(halfway);
 
     if data_vec_length % 2 != 0 {
         halfway += 1;
     }
 
-    let second_half_iter = data_vec.iter().skip(halfway).cloned();
+    let second_half_iter = full_iter.clone().skip(halfway);
 
     let q1_value = median(first_half_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
     let q2_value = median(full_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
