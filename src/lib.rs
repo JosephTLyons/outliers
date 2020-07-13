@@ -1,7 +1,5 @@
 use statrs::statistics::OrderStatistics;
 
-type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
-
 /// This function uses the Tukey method, which uses a multiplier value of 1.5. In the case that is
 /// does not return an `Err`, it returns a tuple of `Vec<f64>`s.  The first vector contains any lower
 /// outliers and the third vector contains any upper outliers.  Additionally, the second vector
@@ -18,7 +16,7 @@ type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
 pub fn get_tukeys_outliers(
     mut data_vec: Vec<f64>,
     data_is_sorted: bool,
-) -> Result<VectorTuple<f64>, &'static str> {
+) -> Result<(Vec<f64>, Vec<f64>, Vec<f64>), &'static str> {
     // Tests for NaNs in floats, should catch cases where the next `unwrap()` would panic, see:
     // https://doc.rust-lang.org/std/vec/struct.Vec.html#method.sort_by
     if data_vec.iter().any(|x| !(x == x)) {
