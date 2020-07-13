@@ -19,7 +19,7 @@ type VectorTuple<T> = (Vec<T>, Vec<T>, Vec<T>);
 /// assert_eq!(results_tuple.2, [22].to_vec()); // Upper outliers
 /// ```
 #[allow(clippy::eq_op)]
-pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
+pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive + Clone>(
     mut data_vec: Vec<T>,
     data_is_sorted: bool,
 ) -> Result<VectorTuple<T>, &'static str> {
@@ -38,11 +38,11 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
 
     match get_quartile_values(&data_vec) {
         Ok((q1_value, _, q3_value)) => {
-            let interquartile_range: f32 = q3_value - q1_value;
+            let interquartile_range = q3_value - q1_value;
 
-            let intermediate_value: f32 = 1.5 * interquartile_range;
-            let lower_range: f32 = q1_value - intermediate_value;
-            let upper_range: f32 = q3_value + intermediate_value;
+            let intermediate_value = 1.5 * interquartile_range;
+            let lower_range = q1_value - intermediate_value;
+            let upper_range = q3_value + intermediate_value;
 
             let mut non_outliers: Vec<T> = Vec::new();
 
@@ -50,9 +50,9 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
                 let data_f32 = ToPrimitive::to_f32(&data)
                     .ok_or(get_error_message(ErrorMessage::ToPrimitiveCast))?;
 
-                if (data_f32) < lower_range {
+                if (data_f64) < lower_range {
                     lower_outliers.push(data);
-                } else if (data_f32) > upper_range {
+                } else if (data_f64) > upper_range {
                     upper_outliers.push(data);
                 } else {
                     non_outliers.push(data);

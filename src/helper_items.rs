@@ -1,8 +1,9 @@
 use num::ToPrimitive;
+use stats::median;
 
 #[derive(std::cmp::PartialEq, std::fmt::Debug)]
 pub enum ErrorMessage {
-    MinimumSetForMedian,
+    MedianFunctionFailed,
     MinimumSetForQuartile,
     NanError,
     ToPrimitiveCast,
@@ -10,7 +11,7 @@ pub enum ErrorMessage {
 
 pub fn get_error_message(error_message: ErrorMessage) -> &'static str {
     match error_message {
-        ErrorMessage::MinimumSetForMedian => "Cannot calculate the median of an empty data set",
+        ErrorMessage::MedianFunctionFailed => "Cannot calculate median of data set",
         ErrorMessage::MinimumSetForQuartile => {
             "Cannot calculate the quartile values of a data set with less than 2 elements"
         }
@@ -19,9 +20,9 @@ pub fn get_error_message(error_message: ErrorMessage) -> &'static str {
     }
 }
 
-pub fn get_quartile_values<T: ToPrimitive>(
+pub fn get_quartile_values<T: ToPrimitive + PartialOrd + Clone>(
     data_vec: &[T],
-) -> Result<(f32, f32, f32), ErrorMessage> {
+) -> Result<(f64, f64, f64), ErrorMessage> {
     let data_vec_length = data_vec.len();
 
     if data_vec_length < 2 {
@@ -30,14 +31,18 @@ pub fn get_quartile_values<T: ToPrimitive>(
 
     let mut halfway = data_vec_length / 2;
 
-    let q1_value = get_median(&data_vec[0..halfway])?;
-    let q2_value = get_median(&data_vec)?;
+    let first_half_iter = data_vec.iter().take(halfway).map(|x| x.clone());
+    let full_iter = data_vec.iter().map(|x| x.clone());
 
     if data_vec_length % 2 != 0 {
         halfway += 1;
     }
 
-    let q3_value = get_median(&data_vec[halfway..data_vec_length])?;
+    let second_half_iter = data_vec.iter().skip(halfway).map(|x| x.clone());
+
+    let q1_value: f64 = median(first_half_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
+    let q2_value = median(full_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
+    let q3_value: f64 = median(second_half_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
 
     Ok((q1_value, q2_value, q3_value))
 }
@@ -132,71 +137,4 @@ fn get_quartile_values_float_set_of_three() {
     let quartile_values_result = get_quartile_values(&data);
 
     assert_eq!(quartile_values_result, Ok((10.167, 11.917, 12.3)));
-}
-
-pub fn get_median<T: ToPrimitive>(data_vec: &[T]) -> Result<f32, ErrorMessage> {
-    let data_vec_length = data_vec.len();
-
-    if data_vec_length == 0 {
-        return Err(ErrorMessage::MinimumSetForMedian);
-    }
-
-    let half_way = data_vec_length / 2;
-
-    let mut result_f32 = match ToPrimitive::to_f32(&data_vec[half_way]) {
-        Some(value_f32) => value_f32,
-        None => return Err(ErrorMessage::ToPrimitiveCast),
-    };
-
-    if data_vec.len() % 2 == 0 {
-        let left_middle = match ToPrimitive::to_f32(&data_vec[half_way - 1]) {
-            Some(value_f32) => value_f32,
-            None => return Err(ErrorMessage::ToPrimitiveCast),
-        };
-
-        result_f32 = (result_f32 + left_middle) / 2.0;
-    }
-
-    Ok(result_f32)
-}
-
-#[test]
-fn get_median_no_elements() {
-    let data: Vec<usize> = [].to_vec();
-    assert!(get_median(&data).is_err());
-}
-
-#[test]
-fn get_median_one_element() {
-    assert!((get_median(&[3]).unwrap() - 3.0).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_even_set() {
-    assert!((get_median(&[1, 2, 3, 4, 5, 6]).unwrap() - 3.5).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_odd_set() {
-    assert!((get_median(&[1, 2, 3, 4, 5]).unwrap() - 3.0).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_random_numbers_even_set() {
-    assert!((get_median(&[1, 11, 34, 66, 209, 353, 1067, 10_453]).unwrap() - 137.5).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_random_numbers_odd_set() {
-    assert!((get_median(&[1, 23, 24, 45, 200, 343, 1001]).unwrap() - 45.0).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_float_negative_even_set() {
-    assert!((get_median(&[-1.32, 32.2]).unwrap() - 15.44).abs() < 0.0001);
-}
-
-#[test]
-fn get_median_float_negative_odd_set() {
-    assert!((get_median(&[-1.32, 32.2, 40.1]).unwrap() - 32.2).abs() < 0.0001);
 }
