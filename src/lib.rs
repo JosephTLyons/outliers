@@ -30,9 +30,7 @@ pub fn get_tukeys_outliers<T: std::cmp::PartialOrd + ToPrimitive>(
     }
 
     if !data_is_sorted {
-        data_vec.sort_by(|a, b| {
-            a.partial_cmp(b).unwrap()
-        });
+        data_vec.sort_by(|a, b| a.partial_cmp(b).unwrap());
     }
 
     let mut lower_outliers: Vec<T> = Vec::new();
