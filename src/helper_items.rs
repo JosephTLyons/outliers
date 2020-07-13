@@ -40,9 +40,9 @@ pub fn get_quartile_values<T: ToPrimitive + PartialOrd + Clone>(
 
     let second_half_iter = data_vec.iter().skip(halfway).map(|x| x.clone());
 
-    let q1_value: f64 = median(first_half_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
+    let q1_value = median(first_half_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
     let q2_value = median(full_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
-    let q3_value: f64 = median(second_half_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
+    let q3_value = median(second_half_iter).ok_or(ErrorMessage::MedianFunctionFailed)?;
 
     Ok((q1_value, q2_value, q3_value))
 }
