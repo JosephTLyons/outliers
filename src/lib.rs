@@ -43,7 +43,8 @@ impl OutlierIdentifier {
     /// returns a tuple of `Vec<f64>`s.  The first vector contains any lower outliers and the third
     /// vector contains any upper outliers.  Additionally, the second vector returned contains all
     /// the non-outliers, so that the data set passed in is returned, in its entirety, as
-    /// partitioned subsets.
+    /// partitioned subsets.  `get_outliers()` will return an `Err` if the `data_set` contains one
+    /// or more `NAN`s or if the `k_value` is a negative number.
     pub fn get_outliers(mut self) -> Result<(Vec<f64>, Vec<f64>, Vec<f64>), &'static str> {
         if self.k_value < 0.0 {
             return Err("K value cannot be negative");
