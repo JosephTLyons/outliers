@@ -50,9 +50,9 @@ impl OutlierIdentifier {
             return Err("K value cannot be negative");
         }
 
-        // Tests for NANs in data_set, should catch cases where the next `unwrap()` would panic,
-        // see: https://doc.rust-lang.org/std/vec/struct.Vec.html#method.sort_by
-        let data_set_has_nans = self.data_set.iter().any(|x| x != x);
+        // This should catch cases where the next `unwrap()` would panic, see:
+        // https://doc.rust-lang.org/std/vec/struct.Vec.html#method.sort_by
+        let data_set_has_nans = self.data_set.iter().any(|x| x.is_nan());
 
         if data_set_has_nans {
             return Err("The data set contains one or more NANs");
