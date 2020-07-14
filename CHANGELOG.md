@@ -1,5 +1,9 @@
 # CHANGELOG:
 
+## July 13, 2020 - v0.4.1
+
+- Documentation fixes
+
 ## July 13, 2020 - v0.4.0
 
 - Restructure code in crate to use a `struct` so that the
