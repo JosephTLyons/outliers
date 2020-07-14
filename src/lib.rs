@@ -9,6 +9,15 @@
 //! ```
 
 use statrs::statistics::OrderStatistics;
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum OutlierError {
+    #[error("The data set contains one or more NANs")]
+    ContainsNANs,
+    #[error("K value cannot be negative")]
+    NegativeKValue,
+}
 
 pub struct OutlierIdentifier {
     data_set: Vec<f64>,
@@ -45,9 +54,9 @@ impl OutlierIdentifier {
     /// the non-outliers, so that the data set passed in is returned, in its entirety, as
     /// partitioned subsets.  `get_outliers()` will return an `Err` if the `data_set` contains one
     /// or more `NAN`s or if the `k_value` is a negative number.
-    pub fn get_outliers(mut self) -> Result<(Vec<f64>, Vec<f64>, Vec<f64>), &'static str> {
+    pub fn get_outliers(mut self) -> Result<(Vec<f64>, Vec<f64>, Vec<f64>), OutlierError> {
         if self.k_value < 0.0 {
-            return Err("K value cannot be negative");
+            return Err(OutlierError::NegativeKValue);
         }
 
         // This should catch cases where the next `unwrap()` would panic, see:
@@ -55,7 +64,7 @@ impl OutlierIdentifier {
         let data_set_has_nans = self.data_set.iter().any(|x| x.is_nan());
 
         if data_set_has_nans {
-            return Err("The data set contains one or more NANs");
+            return Err(OutlierError::ContainsNANs);
         }
 
         if !self.data_is_sorted {
@@ -94,7 +103,7 @@ fn get_outliers_needs_sorted_nan_set() {
     let outlier_identifier = OutlierIdentifier::new(data, false);
     let results_tuple = outlier_identifier.get_outliers();
 
-    assert!(results_tuple.is_err());
+    assert!(matches!(results_tuple, Err(OutlierError::ContainsNANs)));
 }
 
 #[test]
@@ -103,7 +112,7 @@ fn get_outliers_is_sorted_nan_set() {
     let outlier_identifier = OutlierIdentifier::new(data, true);
     let results_tuple = outlier_identifier.get_outliers();
 
-    assert!(results_tuple.is_err());
+    assert!(matches!(results_tuple, Err(OutlierError::ContainsNANs)));
 }
 
 #[test]
@@ -204,5 +213,5 @@ fn negative_k_value_error() {
     let outlier_identifier = OutlierIdentifier::new(data, true).with_k_value(-3.0);
     let results_tuple = outlier_identifier.get_outliers();
 
-    assert!(results_tuple.is_err());
+    assert!(matches!(results_tuple, Err(OutlierError::NegativeKValue)));
 }
