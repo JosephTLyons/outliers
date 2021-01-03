@@ -11,4 +11,4 @@ repository = "https://github.com/JosephTLyons/outliers"
 
 [dependencies]
 statrs = "0.13.0"
-thiserror = "1.0.20"
+thiserror = "1.0.23"
