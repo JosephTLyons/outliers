@@ -27,7 +27,8 @@ pub struct OutlierIdentifier {
 
 impl OutlierIdentifier {
     /// Creates a new `OutlierIdentifier`.  The default `k_value` is `1.5`, a value in outlier
-    /// identification made popular by the mathematician John Tukey.
+    /// identification made popular by the mathematician John Tukey.  If the order state of the data
+    /// is unknown, then use `false` for `data_is_sorted`.
     pub fn new(data_set: Vec<f64>, data_is_sorted: bool) -> OutlierIdentifier {
         OutlierIdentifier {
             data_set,
