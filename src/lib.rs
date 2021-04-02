@@ -106,6 +106,7 @@ impl OutlierIdentifier {
 
         if !self.data_is_sorted {
             self.data_set.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            self.data_is_sorted = true;
         }
 
         let q1_value = self.data_set.lower_quartile();
