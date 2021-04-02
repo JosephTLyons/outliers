@@ -26,7 +26,7 @@ pub struct OutlierIdentifier {
 }
 
 impl OutlierIdentifier {
-    /// Creates a new `OutlierIdentifier`.  The default `k_value` is 1.5, a value in outlier
+    /// Creates a new `OutlierIdentifier`.  The default `k_value` is `1.5`, a value in outlier
     /// identification made popular by the mathematician John Tukey.
     pub fn new(data_set: Vec<f64>, data_is_sorted: bool) -> OutlierIdentifier {
         OutlierIdentifier {
@@ -55,6 +55,42 @@ impl OutlierIdentifier {
     /// partitioned subsets.  `get_outliers()` will return an `Err` if the `data_set` contains one
     /// or more `NAN`s or if the `k_value` is a negative number.
     pub fn get_outliers(mut self) -> Result<(Vec<f64>, Vec<f64>, Vec<f64>), OutlierError> {
+        let (lower_fence, upper_fence) = self.get_fences()?;
+
+        let mut lower_outliers: Vec<f64> = Vec::new();
+        let mut upper_outliers: Vec<f64> = Vec::new();
+        let mut non_outliers: Vec<f64> = Vec::new();
+
+        for data in self.data_set {
+            if data < lower_fence {
+                lower_outliers.push(data);
+            } else if data > upper_fence {
+                upper_outliers.push(data);
+            } else {
+                non_outliers.push(data);
+            }
+        }
+
+        Ok((lower_outliers, non_outliers, upper_outliers))
+    }
+
+    /// Indicates whether the data set has outliers.  This method is useful when one only needs to
+    /// know if a data set has outliers and isn't concerned with the details of the outliers.  This
+    /// method short circuits; if any outliers exist, the moment the first one is found, the method
+    /// immediately returns with `true`, else, it returns `false`.
+    pub fn has_outliers(mut self) -> Result<bool, OutlierError> {
+        let (lower_fence, upper_fence) = self.get_fences()?;
+
+        for data in self.data_set {
+            if data < lower_fence || data > upper_fence {
+                return Ok(true);
+            }
+        }
+
+        Ok(false)
+    }
+
+    fn get_fences(&mut self) -> Result<(f64, f64), OutlierError> {
         if self.k_value < 0.0 {
             return Err(OutlierError::NegativeKValue);
         }
@@ -76,24 +112,10 @@ impl OutlierIdentifier {
         let interquartile_range = q3_value - q1_value;
 
         let intermediate_value = self.k_value * interquartile_range;
-        let lower_range = q1_value - intermediate_value;
-        let upper_range = q3_value + intermediate_value;
+        let lower_fence = q1_value - intermediate_value;
+        let upper_fence = q3_value + intermediate_value;
 
-        let mut lower_outliers: Vec<f64> = Vec::new();
-        let mut upper_outliers: Vec<f64> = Vec::new();
-        let mut non_outliers: Vec<f64> = Vec::new();
-
-        for data in self.data_set {
-            if (data) < lower_range {
-                lower_outliers.push(data);
-            } else if (data) > upper_range {
-                upper_outliers.push(data);
-            } else {
-                non_outliers.push(data);
-            }
-        }
-
-        Ok((lower_outliers, non_outliers, upper_outliers))
+        Ok((lower_fence, upper_fence))
     }
 }
 
@@ -214,4 +236,20 @@ fn negative_k_value_error() {
     let results_tuple = outlier_identifier.get_outliers();
 
     assert!(matches!(results_tuple, Err(OutlierError::NegativeKValue)));
+}
+
+#[test]
+fn has_outliers_false() {
+    let data: Vec<f64> = [1.0, 2.0, 4.0, 10.0].to_vec();
+    let has_outliers = OutlierIdentifier::new(data, true).has_outliers().unwrap();
+
+    assert!(!has_outliers);
+}
+
+#[test]
+fn has_outliers_true() {
+    let data = [-62.3, 67.9, 71.02, 43.3, 51.7, 65.43, 67.23].to_vec();
+    let has_outliers = OutlierIdentifier::new(data, true).has_outliers().unwrap();
+
+    assert!(has_outliers);
 }
