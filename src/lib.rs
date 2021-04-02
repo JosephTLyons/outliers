@@ -114,9 +114,9 @@ impl OutlierIdentifier {
         let upper_quartile = self.data_set.upper_quartile();
         let interquartile_range = upper_quartile - lower_quartile;
 
-        let intermediate_value = self.k_value * interquartile_range;
-        let lower_fence = lower_quartile - intermediate_value;
-        let upper_fence = upper_quartile + intermediate_value;
+        let quartile_adjustment_value = self.k_value * interquartile_range;
+        let lower_fence = lower_quartile - quartile_adjustment_value;
+        let upper_fence = upper_quartile + quartile_adjustment_value;
 
         Ok((lower_fence, upper_fence))
     }
