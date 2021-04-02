@@ -14,7 +14,7 @@ use thiserror::Error;
 #[derive(Error, Debug)]
 pub enum OutlierError {
     #[error("The data set contains one or more NANs")]
-    ContainsNANs,
+    ContainsNans,
     #[error("K value cannot be negative")]
     NegativeKValue,
 }
@@ -54,6 +54,7 @@ impl OutlierIdentifier {
     /// the non-outliers, so that the data set passed in is returned, in its entirety, as
     /// partitioned subsets.  `get_outliers()` will return an `Err` if the `data_set` contains one
     /// or more `NAN`s or if the `k_value` is a negative number.
+    #[allow(clippy::type_complexity)]
     pub fn get_outliers(mut self) -> Result<(Vec<f64>, Vec<f64>, Vec<f64>), OutlierError> {
         let (lower_fence, upper_fence) = self.get_fences()?;
 
@@ -100,7 +101,7 @@ impl OutlierIdentifier {
         let data_set_has_nans = self.data_set.iter().any(|x| x.is_nan());
 
         if data_set_has_nans {
-            return Err(OutlierError::ContainsNANs);
+            return Err(OutlierError::ContainsNans);
         }
 
         if !self.data_is_sorted {
@@ -125,7 +126,7 @@ fn get_outliers_needs_sorted_nan_set() {
     let outlier_identifier = OutlierIdentifier::new(data, false);
     let results_tuple = outlier_identifier.get_outliers();
 
-    assert!(matches!(results_tuple, Err(OutlierError::ContainsNANs)));
+    assert!(matches!(results_tuple, Err(OutlierError::ContainsNans)));
 }
 
 #[test]
@@ -134,7 +135,7 @@ fn get_outliers_is_sorted_nan_set() {
     let outlier_identifier = OutlierIdentifier::new(data, true);
     let results_tuple = outlier_identifier.get_outliers();
 
-    assert!(matches!(results_tuple, Err(OutlierError::ContainsNANs)));
+    assert!(matches!(results_tuple, Err(OutlierError::ContainsNans)));
 }
 
 #[test]
