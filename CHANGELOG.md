@@ -1,5 +1,9 @@
 # CHANGELOG:
 
+## April 1, 2021 - v0.5.0
+
+- Added the `has_outliers()` method.
+
 ## July 13, 2020 - v0.4.1
 
 - Documentation fixes
