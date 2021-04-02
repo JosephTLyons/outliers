@@ -110,13 +110,13 @@ impl OutlierIdentifier {
             self.data_is_sorted = true;
         }
 
-        let q1_value = self.data_set.lower_quartile();
-        let q3_value = self.data_set.upper_quartile();
-        let interquartile_range = q3_value - q1_value;
+        let lower_quartile = self.data_set.lower_quartile();
+        let upper_quartile = self.data_set.upper_quartile();
+        let interquartile_range = upper_quartile - lower_quartile;
 
         let intermediate_value = self.k_value * interquartile_range;
-        let lower_fence = q1_value - intermediate_value;
-        let upper_fence = q3_value + intermediate_value;
+        let lower_fence = lower_quartile - intermediate_value;
+        let upper_fence = upper_quartile + intermediate_value;
 
         Ok((lower_fence, upper_fence))
     }
