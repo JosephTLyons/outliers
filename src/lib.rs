@@ -123,7 +123,7 @@ impl OutlierIdentifier {
 }
 
 #[test]
-fn get_outliers_needs_sorted_nan_set() {
+fn get_outliers_not_sorted_nan_error() {
     let data: Vec<f64> = [f64::NAN, f64::NAN].to_vec();
     let outlier_identifier = OutlierIdentifier::new(data, false);
     let results_tuple = outlier_identifier.get_outliers();
@@ -132,7 +132,7 @@ fn get_outliers_needs_sorted_nan_set() {
 }
 
 #[test]
-fn get_outliers_is_sorted_nan_set() {
+fn get_outliers_sorted_nan_error() {
     let data: Vec<f64> = [3.0, 2.9, 2.8, 33.3, f64::NAN, f64::NAN].to_vec();
     let outlier_identifier = OutlierIdentifier::new(data, true);
     let results_tuple = outlier_identifier.get_outliers();
