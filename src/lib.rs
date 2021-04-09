@@ -14,7 +14,7 @@
 //! use outliers::OutlierIdentifier;
 //!
 //! let data = [0.53, 0.57, 0.51, 0.60, 0.09, 12.75].to_vec();
-//! let has_outliers = OutlierIdentifier::new(data, true).has_outliers().unwrap();
+//! let has_outliers = OutlierIdentifier::new(data, false).has_outliers().unwrap();
 //!
 //! assert!(has_outliers);
 //! ```
@@ -263,7 +263,7 @@ fn has_outliers_false() {
 #[test]
 fn has_outliers_true() {
     let data = [-62.3, 67.9, 71.02, 43.3, 51.7, 65.43, 67.23].to_vec();
-    let has_outliers = OutlierIdentifier::new(data, true).has_outliers().unwrap();
+    let has_outliers = OutlierIdentifier::new(data, false).has_outliers().unwrap();
 
     assert!(has_outliers);
 }

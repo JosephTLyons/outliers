@@ -18,7 +18,7 @@ assert_eq!(results_tuple.2, [22.0].to_vec()); // Upper outliers
 use outliers::OutlierIdentifier;
 
 let data = [0.53, 0.57, 0.51, 0.60, 0.09, 12.75].to_vec();
-let has_outliers = OutlierIdentifier::new(data, true).has_outliers().unwrap();
+let has_outliers = OutlierIdentifier::new(data, false).has_outliers().unwrap();
 
 assert!(has_outliers);
 ```
