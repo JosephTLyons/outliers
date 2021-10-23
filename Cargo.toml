@@ -2,7 +2,7 @@
 name = "outliers"
 version = "0.5.0"
 authors = ["Joseph T Lyons <JosephTLyons@gmail.com>"]
-edition = "2018"
+edition = "2021"
 description = "Identify outliers in a data set."
 license = "GPL-3.0-only"
 repository = "https://github.com/JosephTLyons/outliers"
