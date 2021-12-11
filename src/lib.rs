@@ -53,11 +53,7 @@ impl OutlierIdentifier {
     /// identified as outliers.  The `k_value` must be non-negative, or `get_outliers()` will return
     /// an `Err`.
     pub fn with_k_value(self, k_value: f64) -> OutlierIdentifier {
-        OutlierIdentifier {
-            data_set: self.data_set,
-            data_is_sorted: self.data_is_sorted,
-            k_value,
-        }
+        OutlierIdentifier { k_value, ..self }
     }
 
     /// Performs the outlier identification.  In the case that is does not return an `Err`, it
