@@ -84,8 +84,8 @@ impl OutlierIdentifier {
     }
 
     /// Indicates whether the data set has outliers.  This method is useful when one only needs to
-    /// know if a data set has outliers and isn't concerned with the details of the outliers.  This
-    /// method short circuits; if any outliers exist, the moment the first one is found, the method
+    /// know if a data set contains outliers, but isn't concerned with their details.  This method
+    /// short circuits; if any outliers exist, the moment the first one is found, the method
     /// immediately returns with `true`, else, it returns `false`.
     pub fn has_outliers(mut self) -> Result<bool, OutlierError> {
         let (lower_fence, upper_fence) = self.get_fences()?;
